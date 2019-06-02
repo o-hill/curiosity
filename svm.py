@@ -95,6 +95,7 @@ if __name__ == '__main__':
     plt.scatter(A[:, 0], A[:, 1], color=colors)
     plt.plot(line, m * line + b)
     plt.ylim(-10, 18)
+    plt.xlim(-5, 22)
     plt.show()
 
 
