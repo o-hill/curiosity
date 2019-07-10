@@ -10,6 +10,7 @@ import pylab as plt
 # from sklearn.cluster import AgglomerativeClustering as KMeans
 from sklearn.cluster import Birch as KMeans
 from sklearn.decomposition import PCA
+from autoencoder import *
 
 
 if __name__ == "__main__":
@@ -37,27 +38,31 @@ if __name__ == "__main__":
     twos = x_train[twos_idx]
     fours = x_train[fours_idx]
 
-    model = Sequential()
-    model.add(
-        Conv2D(32, kernel_size=(3, 3), activation="relu", input_shape=input_shape)
-    )
-    model.add(Conv2D(64, (3, 3), activation="relu"))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    # model.add(Dropout(0.25))
-    model.add(Flatten())
-    model.add(Dense(128, activation="relu"))
-    # model.add(Dropout(0.5))
-    # model.add(Dense(num_classes, activation="softmax"))
-    model.compile(
-        loss=keras.losses.categorical_crossentropy,
-        optimizer=keras.optimizers.Adadelta(),
-        metrics=["accuracy"],
-    )
+    if True:
+        model = Sequential()
+        model.add(
+            Conv2D(32, kernel_size=(3, 3), activation="relu", input_shape=input_shape)
+        )
+        model.add(Conv2D(64, (3, 3), activation="relu"))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        # model.add(Dropout(0.25))
+        model.add(Flatten())
+        model.add(Dense(128, activation="relu"))
+        # model.add(Dropout(0.5))
+        # model.add(Dense(num_classes, activation="softmax"))
+        model.compile(
+            loss=keras.losses.categorical_crossentropy,
+            optimizer=keras.optimizers.Adadelta(),
+            metrics=["accuracy"],
+        )
+    else:
+        ae = Autoencoder("autoencoder_weights.h5")
+        model = ae.encoder
 
     ones_latent = model.predict(ones)
     twos_latent = model.predict(twos)
     fours_latent = model.predict(fours)
-    all_latent = np.vstack((ones_latent, twos_latent, fours_latent))
+    all_latent = np.vstack((ones_latent, twos_latent))
     p = PCA(n_components=32)
     p.fit(all_latent)
     low_d = p.transform(all_latent)
@@ -83,6 +88,6 @@ if __name__ == "__main__":
     plt.plot(low_d[first_cluster, 0], low_d[first_cluster, 1], "b.")
     plt.plot(low_d[second_cluster, 0], low_d[second_cluster, 1], "r.")
 
-    X = np.vstack((ones, twos))
-    y = np.atleast_1d(labels[: len(ones) + len(twos)])
-    model.fit(X, y, epochs=1)
+    # X = np.vstack((ones, twos))
+    # y = np.atleast_1d(labels[: len(ones) + len(twos)])
+    # model.fit(X, y, epochs=1)
