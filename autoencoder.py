@@ -1,6 +1,8 @@
 from glob import glob
 from keras.layers import (
     Input,
+    Reshape,
+    Flatten,
     Dense,
     Conv2D,
     MaxPooling2D,
@@ -31,17 +33,21 @@ class Autoencoder:
         # Create an input of the appropriate size.
         self.input_image = Input(image_size)
 
-        self.build_encoder()
-        self.build_decoder()
+        latent_dim = (image_size[0] // 2) ** 2
+
+        self.build_encoder(latent_dim)
+        self.encoder = Model(self.input_image, self.encoded)
+        print(self.encoder.summary())
+
+        self.build_decoder(image_size[0] // 2)
         self.autoencoder = Model(self.input_image, self.decoded)
         self.autoencoder.compile(optimizer="adam", loss="mean_squared_error")
 
-        self.encoder = Model(self.input_image, self.encoded)
 
         if weights_path:
             self.autoencoder.load_weights(weights_path)
 
-    def build_encoder(self):
+    def build_encoder(self, latent_dim: int):
         # Build the first half of autoencoder... the encoder.
 
         one = Conv2D(32, 3, activation="relu", padding="same")(self.input_image)
@@ -52,12 +58,15 @@ class Autoencoder:
         # six = MaxPooling2D((2, 2))(five)
         # seven = Conv2D(128, 3, activation="relu", padding="same")(five)
         eight = Conv2D(64, 3, activation="relu", padding="same")(two)
-        self.encoded = MaxPooling2D((2, 2), name="encode_output")(eight)
+        nine = MaxPooling2D((2, 2), name="encode_output")(eight)
+        ten = Flatten()(nine)
+        self.encoded = Dense(latent_dim, activation='relu')(ten)
 
-    def build_decoder(self):
+    def build_decoder(self, dim: int):
         # Decode the encoded CT scan images.
 
-        one = Conv2D(64, 3, activation="relu", padding="same")(self.encoded)
+        reshape = Reshape((dim, dim, 1))(self.encoded)
+        one = Conv2D(64, 3, activation="relu", padding="same")(reshape)
         two = Conv2D(16, 3, activation="relu", padding="same")(one)
         # three = UpSampling2D((2, 2))(two)
         # four = Conv2D(64, 3, activation="relu", padding="same")(two)
@@ -72,7 +81,8 @@ class Autoencoder:
         # Train the autoencoder.
         for itr in range(1000):
             print(f"> Iteration {itr} of 1000")
-            self.autoencoder.fit(X, X, epochs=50, batch_size=64, shuffle=True)
+            self.autoencoder.fit(X, X, epochs=1, batch_size=64, shuffle=True)
+            from ipdb import set_trace as debug; debug()
             self.autoencoder.save('autoencoder_weights.h5')
 
 if __name__ == '__main__':
@@ -89,7 +99,6 @@ if __name__ == '__main__':
 
     ae = Autoencoder()
     train = np.vstack((ones, twos))
-    np.random.shuffle(train)
     ae.train(train)
 
     latent_representations = ae.encoder.predict(train)[0]
