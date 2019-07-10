@@ -40,7 +40,7 @@ class Autoencoder:
 
         self.build_decoder(image_size[0] // 2)
         self.autoencoder = Model(self.input_image, self.decoded)
-        self.autoencoder.compile(optimizer="adam", loss="mean_squared_error")
+        self.autoencoder.compile(optimizer="adadelta", loss="mean_squared_error")
 
         if weights_path:
             self.autoencoder.load_weights(weights_path)
@@ -50,14 +50,14 @@ class Autoencoder:
         # Build the first half of autoencoder... the encoder.
 
         one = Conv2D(32, 3, activation="relu", padding="same")(self.input_image)
-        two = Conv2D(32, 3, activation="relu", padding="same")(one)
+        two = Conv2D(64, 3, activation="relu", padding="same")(one)
         # three = MaxPooling2D((2, 2))(two)
         # four = Conv2D(64, 3, activation="relu", padding="same")(two)
         # five = Conv2D(64, 3, activation="relu", padding="same")(four)
         # six = MaxPooling2D((2, 2))(five)
         # seven = Conv2D(128, 3, activation="relu", padding="same")(five)
-        eight = Conv2D(64, 3, activation="relu", padding="same")(two)
-        nine = MaxPooling2D((2, 2), name="encode_output")(eight)
+        # eight = Conv2D(64, 3, activation="relu", padding="same")(two)
+        nine = MaxPooling2D((2, 2), name="encode_output")(two)
         ten = Flatten()(nine)
         self.encoded = Dense(latent_dim, activation='relu')(ten)
 
@@ -66,7 +66,7 @@ class Autoencoder:
 
         reshape = Reshape((dim, dim, 1))(self.encoded)
         one = Conv2D(64, 3, activation="relu", padding="same")(reshape)
-        two = Conv2D(16, 3, activation="relu", padding="same")(one)
+        two = Conv2D(32, 3, activation="relu", padding="same")(one)
         # three = UpSampling2D((2, 2))(two)
         # four = Conv2D(64, 3, activation="relu", padding="same")(two)
         # five = Conv2D(64, 3, activation="relu", padding="same")(four)
@@ -74,7 +74,7 @@ class Autoencoder:
         # seven = Conv2D(32, 3, activation="relu", padding="same")(five)
         # eight = Conv2D(32, 3, activation="relu", padding="same")(seven)
         nine = UpSampling2D((2, 2))(two)
-        self.decoded = Conv2D(1, 3, activation="sigmoid", padding="same")(nine)
+        self.decoded = Conv2D(1, 3, activation="relu", padding="same")(nine)
 
     def train(self, X: np.ndarray):
         # Train the autoencoder.
