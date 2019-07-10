@@ -37,15 +37,14 @@ class Autoencoder:
 
         self.build_encoder(latent_dim)
         self.encoder = Model(self.input_image, self.encoded)
-        print(self.encoder.summary())
 
         self.build_decoder(image_size[0] // 2)
         self.autoencoder = Model(self.input_image, self.decoded)
         self.autoencoder.compile(optimizer="adam", loss="mean_squared_error")
 
-
         if weights_path:
             self.autoencoder.load_weights(weights_path)
+
 
     def build_encoder(self, latent_dim: int):
         # Build the first half of autoencoder... the encoder.
