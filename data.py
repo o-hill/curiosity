@@ -6,7 +6,9 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 import numpy as np
 import pylab as plt
-from sklearn.cluster import KMeans
+
+# from sklearn.cluster import AgglomerativeClustering as KMeans
+from sklearn.cluster import Birch as KMeans
 from sklearn.decomposition import PCA
 
 
@@ -29,9 +31,11 @@ if __name__ == "__main__":
 
     ones_idx = np.where(y_train == 1)[0]
     twos_idx = np.where(y_train == 2)[0]
+    fours_idx = np.where(y_train == 4)[0]
 
     ones = x_train[ones_idx]
     twos = x_train[twos_idx]
+    fours = x_train[fours_idx]
 
     model = Sequential()
     model.add(
@@ -51,19 +55,34 @@ if __name__ == "__main__":
     )
 
     ones_latent = model.predict(ones)
-    twos_latent = model.predict(ones)
-    all_latent = np.vstack((ones_latent, twos_latent))
-    p = PCA(n_components=2)
+    twos_latent = model.predict(twos)
+    fours_latent = model.predict(fours)
+    all_latent = np.vstack((ones_latent, twos_latent, fours_latent))
+    p = PCA(n_components=32)
     p.fit(all_latent)
     low_d = p.transform(all_latent)
-    k = KDE(n_clusters=2)
+    k = KMeans(n_clusters=2)
     k.fit(low_d)
     labels = k.labels_
+    acc_1 = (
+        (labels[: len(ones)] == 1).sum()
+        + (labels[len(ones) : len(ones) + len(twos)] == 0).sum()
+    ) / (len(ones) + len(twos))
+
+    acc_2 = (
+        (labels[: len(ones)] == 0).sum()
+        + (labels[len(ones) : len(ones) + len(twos)] == 1).sum()
+    ) / (len(ones) + len(twos))
+    acc = np.max((acc_1, acc_2))
+    print(f"Clustering accuracy is {acc*100:0.2f}%")
 
     plt.close("all")
+    plt.ion()
     first_cluster = np.where(labels == 0)[0]
     second_cluster = np.where(labels == 1)[0]
-    for idx in first_cluster:
-        plt.plot(low_d[idx, 0], low_d[idx, 1], "bo")
-    for idx in second_cluster:
-        plt.plot(low_d[idx, 0], low_d[idx, 1], "ro")
+    plt.plot(low_d[first_cluster, 0], low_d[first_cluster, 1], "b.")
+    plt.plot(low_d[second_cluster, 0], low_d[second_cluster, 1], "r.")
+
+    X = np.vstack((ones, twos))
+    y = np.atleast_1d(labels[: len(ones) + len(twos)])
+    model.fit(X, y, epochs=1)

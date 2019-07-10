@@ -79,7 +79,7 @@ class Autoencoder:
 
     def train(self, X: np.ndarray):
         # Train the autoencoder.
-        for itr in range(1000):
+        for itr in range(100):
             print(f"> Iteration {itr} of 1000")
             self.autoencoder.fit(X, X, epochs=1, batch_size=64, shuffle=True)
             from ipdb import set_trace as debug; debug()
