@@ -5,10 +5,12 @@
 '''
 
 import numpy as np
+from pudb import set_trace as debug
 
 
 def d(x: np.ndarray, y: np.ndarray) -> float:
     '''Compute euclidean distance between x and y.'''
+    debug()
     return np.linalg.norm(x - y)
 
 
