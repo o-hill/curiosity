@@ -17,7 +17,7 @@ def compute_bic(X, labels):
         X_ = X[labels == k, :]
         n = X_.shape[0]
         det_cov = np.linalg.det(np.cov(X_.T))
-        bic += 0.5 * n * np.log(det_cov)
+        bic -= 0.5 * n * np.log(det_cov)
     bic -= N * K * (d + 0.5 * d * (d + 1))
     return bic
 
@@ -70,9 +70,15 @@ class LARC:
         self.model.fit(X, self.labels, epochs=5)
 
 
+def label_to_one_hot(labels):
+    nb_labels = np.unique_labels(labels)
+
+
+
 def eigenvalue(A, v):
     Av = A.dot(v)
     return v.dot(Av)
+
 
 def power_iteration(A):
     n, d = A.shape
