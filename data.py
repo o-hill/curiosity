@@ -1,7 +1,7 @@
 import keras
 from keras.datasets import mnist
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Input, Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 import numpy as np
@@ -62,8 +62,8 @@ if __name__ == "__main__":
     ones_latent = model.predict(ones)
     twos_latent = model.predict(twos)
     fours_latent = model.predict(fours)
-    all_latent = np.vstack((ones_latent, twos_latent))
-    p = PCA(n_components=32)
+    all_latent = np.vstack((ones_latent, twos_latent, fours_latent))
+    p = PCA(n_components=3)
     p.fit(all_latent)
     low_d = p.transform(all_latent)
     k = KMeans(n_clusters=2)
@@ -91,3 +91,5 @@ if __name__ == "__main__":
     # X = np.vstack((ones, twos))
     # y = np.atleast_1d(labels[: len(ones) + len(twos)])
     # model.fit(X, y, epochs=1)
+    X_ = low_d[labels == 0, :]
+    labels_ = np.zeros(X_.shape[0])

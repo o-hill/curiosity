@@ -78,10 +78,10 @@ class Autoencoder:
 
     def train(self, X: np.ndarray):
         # Train the autoencoder.
-        for itr in range(100):
+        for itr in range(10):
             print(f"> Iteration {itr} of 1000")
             self.autoencoder.fit(X, X, epochs=1, batch_size=64, shuffle=True)
-            from ipdb import set_trace as debug; debug()
+            # from ipdb import set_trace as debug; debug()
             self.autoencoder.save('autoencoder_weights.h5')
 
 if __name__ == '__main__':
@@ -100,16 +100,16 @@ if __name__ == '__main__':
     train = np.vstack((ones, twos))
     ae.train(train)
 
-    latent_representations = ae.encoder.predict(train)[0]
-    decomp = PCA(n_components=2)
-    plottable = decomp.fit(latent_representations).transform(latent_representations)
+    # latent_representations = ae.encoder.predict(train)[0]
+    # decomp = PCA(n_components=2)
+    # plottable = decomp.fit(latent_representations).transform(latent_representations)
 
-    from matplotlib import pyplot as plt
-    import seaborn as sns
-    import matplotlib as mpl
-    mpl.style.use('seaborn')
+    # from matplotlib import pyplot as plt
+    # import seaborn as sns
+    # import matplotlib as mpl
+    # mpl.style.use('seaborn')
 
-    plt.plot(plottable)
+    # plt.plot(plottable)
 
 
 
