@@ -78,10 +78,9 @@ class Autoencoder:
 
     def train(self, X: np.ndarray):
         # Train the autoencoder.
-        for itr in range(100):
+        for itr in range(1000):
             print(f"> Iteration {itr} of 1000")
-            self.autoencoder.fit(X, X, epochs=1, batch_size=64, shuffle=True)
-            from ipdb import set_trace as debug; debug()
+            self.autoencoder.fit(X, X, epochs=50, batch_size=64, shuffle=True)
             self.autoencoder.save('autoencoder_weights.h5')
 
 if __name__ == '__main__':
@@ -92,12 +91,13 @@ if __name__ == '__main__':
 
     # Need (n_rows, n_cols, n_channels) for keras.
     X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], X_train.shape[2], 1)
+    X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], X_test.shape[2], 1)
 
     ones = X_train[np.where(y_train == 1)[0]]
     twos = X_train[np.where(y_train == 2)[0]]
 
     ae = Autoencoder()
-    train = np.vstack((ones, twos))
+    train = np.vstack((X_train, X_test))
     ae.train(train)
 
     latent_representations = ae.encoder.predict(train)[0]
