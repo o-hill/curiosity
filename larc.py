@@ -6,6 +6,9 @@ from keras.layers import Input, Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 
+from sklearn.svm import SVC
+from sklearn.neighbors import BallTree
+
 
 def compute_bic(X, labels):
     """Compute the Bayesian Information Criterion for multivariate Gaussian likelihoods."""
@@ -68,6 +71,18 @@ class LARC:
 
         # Now train the neural network given these labels...
         self.model.fit(X, self.labels, epochs=5)
+
+
+def cluster_evaluation(X: np.ndarray, y: np.ndarray, centroids: np.ndarray) -> bool:
+    '''Evaluates a clustering and returns true if it should be split.'''
+
+    # Find the geometric relationships with a ball tree.
+    bt = BallTree(X)
+
+    # Find the SVM for the data.
+    svm = SVC().fit(X, y).support_vectors_
+
+
 
 
 def label_to_one_hot(labels):

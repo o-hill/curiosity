@@ -78,16 +78,9 @@ class Autoencoder:
 
     def train(self, X: np.ndarray):
         # Train the autoencoder.
-<<<<<<< HEAD
         for itr in range(1000):
             print(f"> Iteration {itr} of 1000")
             self.autoencoder.fit(X, X, epochs=50, batch_size=64, shuffle=True)
-=======
-        for itr in range(10):
-            print(f"> Iteration {itr} of 1000")
-            self.autoencoder.fit(X, X, epochs=1, batch_size=64, shuffle=True)
-            # from ipdb import set_trace as debug; debug()
->>>>>>> 5f16ec3bf4da3c1bd11af0620b61f7d4c3034e39
             self.autoencoder.save('autoencoder_weights.h5')
 
 if __name__ == '__main__':
