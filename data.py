@@ -10,7 +10,9 @@ import pylab as plt
 # from sklearn.cluster import AgglomerativeClustering as KMeans
 from sklearn.cluster import Birch as KMeans
 from sklearn.decomposition import PCA
-from autoencoder import *
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+
+# from autoencoder import *
 
 
 if __name__ == "__main__":
@@ -63,12 +65,16 @@ if __name__ == "__main__":
     twos_latent = model.predict(twos)
     fours_latent = model.predict(fours)
     all_latent = np.vstack((ones_latent, twos_latent, fours_latent))
-    p = PCA(n_components=3)
+    all_latent = np.vstack((ones_latent))
+    p = PCA(n_components=5)
     p.fit(all_latent)
     low_d = p.transform(all_latent)
-    k = KMeans(n_clusters=2)
+    k = KMeans(n_clusters=3)
     k.fit(low_d)
     labels = k.labels_
+    lda = LDA(n_components=2)
+    lda.fit(all_latent, labels)
+    low_d = lda.transform(all_latent)
     acc_1 = (
         (labels[: len(ones)] == 1).sum()
         + (labels[len(ones) : len(ones) + len(twos)] == 0).sum()
@@ -85,8 +91,10 @@ if __name__ == "__main__":
     plt.ion()
     first_cluster = np.where(labels == 0)[0]
     second_cluster = np.where(labels == 1)[0]
+    third_cluster = np.where(labels == 2)[0]
     plt.plot(low_d[first_cluster, 0], low_d[first_cluster, 1], "b.")
     plt.plot(low_d[second_cluster, 0], low_d[second_cluster, 1], "r.")
+    plt.plot(low_d[third_cluster, 0], low_d[third_cluster, 1], "g.")
 
     # X = np.vstack((ones, twos))
     # y = np.atleast_1d(labels[: len(ones) + len(twos)])
