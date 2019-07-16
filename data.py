@@ -64,6 +64,7 @@ if __name__ == "__main__":
     ones_latent = model.predict(ones)
     twos_latent = model.predict(twos)
     fours_latent = model.predict(fours)
+
     all_latent = np.vstack((ones_latent, twos_latent, fours_latent))
     all_latent = np.vstack((ones_latent))
     p = PCA(n_components=5)
@@ -95,6 +96,12 @@ if __name__ == "__main__":
     plt.plot(low_d[first_cluster, 0], low_d[first_cluster, 1], "b.")
     plt.plot(low_d[second_cluster, 0], low_d[second_cluster, 1], "r.")
     plt.plot(low_d[third_cluster, 0], low_d[third_cluster, 1], "g.")
+
+    c_one = np.mean(low_d[first_cluster], axis=0)
+    c_two = np.mean(low_d[second_cluster], axis=0)
+
+    plt.plot([c_one[0]], [c_one[1]], 'y+')
+    plt.plot([c_two[0]], [c_two[1]], 'k+')
 
     # X = np.vstack((ones, twos))
     # y = np.atleast_1d(labels[: len(ones) + len(twos)])
