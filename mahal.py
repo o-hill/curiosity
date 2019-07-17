@@ -80,4 +80,4 @@ def find_valid_indices(X):
     d = mahalanobis(X)
     mu = d.mean()
     std = d.std()
-    return np.where(d < mu + 1*std)[0]
+    return np.where(d < mu + 1.5 * std)[0]
