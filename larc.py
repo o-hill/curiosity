@@ -191,22 +191,16 @@ if __name__ == "__main__":
     l.fit(ones_twos, nb_epochs=1, use_network=False)
     l.fit(ones_twos, nb_epochs=1, use_network=False)
     l.fit(ones_twos, nb_epochs=1, use_network=True)
-    # l.fit(ones_twos, nb_epochs=1, use_network=False)
-    # l.fit(ones_twos, nb_epochs=1, use_network=False)
-    # l.fit(ones_twos, nb_epochs=1, use_network=True)
-    # l.fit(ones_twos, nb_epochs=1, use_network=False)
     _, X_ = l.project_latent(ones_twos, nb_dims=32)
-    # labels = l.labels
     labels = l.predict_labels(ones_twos)
 
     plt.ion()
     plt.close("all")
-    labels = labels[l.valid_idx]
     first_cluster = np.where(labels == 0)[0]
     second_cluster = np.where(labels == 1)[0]
     third_cluster = np.where(labels == 2)[0]
-    plt.plot(X_[first_cluster, 0], X_[first_cluster, 1], "b.")
-    plt.plot(X_[second_cluster, 0], X_[second_cluster, 1], "r.")
+    plt.plot(X_[first_cluster, 0], X_[first_cluster, 3], "b.")
+    plt.plot(X_[second_cluster, 0], X_[second_cluster, 3], "r.")
 
     acc_1 = (
         (labels[: len(first)] == 1).sum()
