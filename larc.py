@@ -176,16 +176,16 @@ if __name__ == "__main__":
     eights_idx = np.where(y_train == 8)[0]
     threes_idx = np.where(y_train == 3)[0]
 
-    ones = x_train[ones_idx] / 255
-    twos = x_train[twos_idx] / 255
-    threes = x_train[threes_idx] / 255
-    fours = x_train[fours_idx] / 255
-    eights = x_train[eights_idx] / 255
+    x_train = x_train / 255
+    ones = x_train[ones_idx]
+    twos = x_train[twos_idx]
+    threes = x_train[threes_idx]
+    fours = x_train[fours_idx]
+    eights = x_train[eights_idx]
     first = twos
     second = fours
 
     ones_twos = np.vstack((first, second))
-
     ones_twos -= ones_twos.mean(0)
 
     l = LARC()
@@ -201,8 +201,8 @@ if __name__ == "__main__":
     first_cluster = np.where(labels == 0)[0]
     second_cluster = np.where(labels == 1)[0]
     third_cluster = np.where(labels == 2)[0]
-    plt.plot(X_[first_cluster, 0], X_[first_cluster, 2], "b.")
-    plt.plot(X_[second_cluster, 0], X_[second_cluster, 2], "r.")
+    plt.plot(X_[first_cluster, 0], X_[first_cluster, 3], "b.")
+    plt.plot(X_[second_cluster, 0], X_[second_cluster, 3], "r.")
 
     acc_1 = (
         (labels[: len(first)] == 1).sum()
