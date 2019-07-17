@@ -8,14 +8,15 @@ import numpy as np
 import pylab as plt
 
 # from sklearn.cluster import AgglomerativeClustering as KMeans
-from sklearn.cluster import Birch as KMeans
+from sklearn.cluster import Birch as Cluster
 from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 
 # from autoencoder import *
 
 
-if __name__ == "__main__":
+def main() -> tuple:
+    '''Does everything.'''
 
     # input image dimensions
     img_rows, img_cols = 28, 28
@@ -70,12 +71,12 @@ if __name__ == "__main__":
     p = PCA(n_components=5)
     p.fit(all_latent)
     low_d = p.transform(all_latent)
-    k = KMeans(n_clusters=3)
+    k = Cluster(n_clusters=3)
     k.fit(low_d)
     labels = k.labels_
-    lda = LDA(n_components=2)
-    lda.fit(all_latent, labels)
-    low_d = lda.transform(all_latent)
+    # lda = LDA(n_components=2)
+    # lda.fit(all_latent, labels)
+    # low_d = lda.transform(all_latent)
     acc_1 = (
         (labels[: len(ones)] == 1).sum()
         + (labels[len(ones) : len(ones) + len(twos)] == 0).sum()
@@ -108,3 +109,10 @@ if __name__ == "__main__":
     # model.fit(X, y, epochs=1)
     X_ = low_d[labels == 0, :]
     labels_ = np.zeros(X_.shape[0])
+
+    return all_latent, low_d, labels
+
+
+if __name__ == "__main__":
+    main()
+
