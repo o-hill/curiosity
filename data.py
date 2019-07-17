@@ -66,12 +66,12 @@ def main() -> tuple:
     twos_latent = model.predict(twos)
     fours_latent = model.predict(fours)
 
-    all_latent = np.vstack((ones_latent, twos_latent, fours_latent))
-    all_latent = np.vstack((ones_latent))
+    all_latent = np.vstack((ones_latent, twos_latent))
+    # all_latent = np.vstack((ones_latent))
     p = PCA(n_components=5)
     p.fit(all_latent)
     low_d = p.transform(all_latent)
-    k = Cluster(n_clusters=3)
+    k = Cluster(n_clusters=2)
     k.fit(low_d)
     labels = k.labels_
     # lda = LDA(n_components=2)
@@ -93,10 +93,10 @@ def main() -> tuple:
     plt.ion()
     first_cluster = np.where(labels == 0)[0]
     second_cluster = np.where(labels == 1)[0]
-    third_cluster = np.where(labels == 2)[0]
+    # third_cluster = np.where(labels == 2)[0]
     plt.plot(low_d[first_cluster, 0], low_d[first_cluster, 1], "b.")
     plt.plot(low_d[second_cluster, 0], low_d[second_cluster, 1], "r.")
-    plt.plot(low_d[third_cluster, 0], low_d[third_cluster, 1], "g.")
+    # plt.plot(low_d[third_cluster, 0], low_d[third_cluster, 1], "g.")
 
     c_one = np.mean(low_d[first_cluster], axis=0)
     c_two = np.mean(low_d[second_cluster], axis=0)
