@@ -162,66 +162,6 @@ class LARC:
             )  # map back to original indices
         self.valid_idx = np.array(self.valid_idx)
 
-
-if __name__ == "__main__":
-
-    # Load some MNIST data.
-    img_rows, img_cols = 28, 28
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    if K.image_data_format() == "channels_first":
-        x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
-        x_test = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
-        input_shape = (1, img_rows, img_cols)
-    else:
-        x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
-        x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
-        input_shape = (img_rows, img_cols, 1)
-
-    ones_idx = np.where(y_train == 1)[0]
-    twos_idx = np.where(y_train == 2)[0]
-    fours_idx = np.where(y_train == 4)[0]
-    eights_idx = np.where(y_train == 8)[0]
-    threes_idx = np.where(y_train == 3)[0]
-
-    ones = x_train[ones_idx] / 255
-    twos = x_train[twos_idx] / 255
-    threes = x_train[threes_idx] / 255
-    fours = x_train[fours_idx] / 255
-    eights = x_train[eights_idx] / 255
-    first = twos
-    second = threes
-
-    ones_twos = np.vstack((first, second))
-
-    l = LARC()
-    l.fit(ones_twos, nb_epochs=2, use_network=False)
-    l.fit(ones_twos, nb_epochs=2, use_network=True)
-    l.fit(ones_twos, nb_epochs=2, use_network=False)
-    _, X_ = l.project_latent(ones_twos, nb_dims=32)
-    # labels = l.labels
-    labels = l.predict_labels(ones_twos)
-
-    plt.ion()
-    plt.close("all")
-    first_cluster = np.where(labels == 0)[0]
-    second_cluster = np.where(labels == 1)[0]
-    third_cluster = np.where(labels == 2)[0]
-    plt.plot(X_[first_cluster, 0], X_[first_cluster, 2], "b.")
-    plt.plot(X_[second_cluster, 0], X_[second_cluster, 2], "r.")
-
-    acc_1 = (
-        (labels[: len(first)] == 1).sum()
-        + (labels[len(first) : len(first) + len(second)] == 0).sum()
-    ) / (len(first) + len(second))
-
-    acc_2 = (
-        (labels[: len(first)] == 0).sum()
-        + (labels[len(first) : len(first) + len(second)] == 1).sum()
-    ) / (len(first) + len(second))
-    acc = np.max((acc_1, acc_2))
-    print(f"Clustering accuracy is {acc*100:0.2f}%")
-=======
-
         # Cluster the data.
         c = Cluster(n_clusters=2)
         self.clustering = c.fit(X_proj)
@@ -337,20 +277,63 @@ def power_iteration(A):
 
 
 
+if __name__ == "__main__":
+
+    # Load some MNIST data.
+    img_rows, img_cols = 28, 28
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    if K.image_data_format() == "channels_first":
+        x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
+        x_test = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
+        input_shape = (1, img_rows, img_cols)
+    else:
+        x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
+        x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
+        input_shape = (img_rows, img_cols, 1)
+
+    ones_idx = np.where(y_train == 1)[0]
+    twos_idx = np.where(y_train == 2)[0]
+    fours_idx = np.where(y_train == 4)[0]
+    eights_idx = np.where(y_train == 8)[0]
+    threes_idx = np.where(y_train == 3)[0]
+
+    ones = x_train[ones_idx] / 255
+    twos = x_train[twos_idx] / 255
+    threes = x_train[threes_idx] / 255
+    fours = x_train[fours_idx] / 255
+    eights = x_train[eights_idx] / 255
+    first = twos
+    second = threes
+
+    ones_twos = np.vstack((first, second))
+
+    l = LARC()
+    l.fit(ones_twos, nb_epochs=2, use_network=False)
+    l.fit(ones_twos, nb_epochs=2, use_network=True)
+    l.fit(ones_twos, nb_epochs=2, use_network=False)
+    _, X_ = l.project_latent(ones_twos, nb_dims=32)
+    # labels = l.labels
+    labels = l.predict_labels(ones_twos)
+
+    plt.ion()
+    plt.close("all")
+    first_cluster = np.where(labels == 0)[0]
+    second_cluster = np.where(labels == 1)[0]
+    third_cluster = np.where(labels == 2)[0]
+    plt.plot(X_[first_cluster, 0], X_[first_cluster, 2], "b.")
+    plt.plot(X_[second_cluster, 0], X_[second_cluster, 2], "r.")
+
+    acc_1 = (
+        (labels[: len(first)] == 1).sum()
+        + (labels[len(first) : len(first) + len(second)] == 0).sum()
+    ) / (len(first) + len(second))
+
+    acc_2 = (
+        (labels[: len(first)] == 0).sum()
+        + (labels[len(first) : len(first) + len(second)] == 1).sum()
+    ) / (len(first) + len(second))
+    acc = np.max((acc_1, acc_2))
+    print(f"Clustering accuracy is {acc*100:0.2f}%")
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> 27724e85fa9f372d3486b7ce3f58c92b00e88aaf
