@@ -59,7 +59,7 @@ class LARC:
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Dropout(0.25))
         model.add(Flatten())
-        model.add(Dense(128, activation="relu", name="latent"))
+        model.add(Dense(200, activation="relu", name="latent"))
         model.add(Dropout(0.5))
         model.add(Dense(num_classes, activation="softmax"))
         # model.layers[-1].trainable = False
@@ -182,9 +182,11 @@ if __name__ == "__main__":
     fours = x_train[fours_idx] / 255
     eights = x_train[eights_idx] / 255
     first = twos
-    second = threes
+    second = fours
 
     ones_twos = np.vstack((first, second))
+
+    ones_twos -= ones_twos.mean(0)
 
     l = LARC()
     l.fit(ones_twos, nb_epochs=1, use_network=False)
@@ -199,8 +201,8 @@ if __name__ == "__main__":
     first_cluster = np.where(labels == 0)[0]
     second_cluster = np.where(labels == 1)[0]
     third_cluster = np.where(labels == 2)[0]
-    plt.plot(X_[first_cluster, 0], X_[first_cluster, 3], "b.")
-    plt.plot(X_[second_cluster, 0], X_[second_cluster, 3], "r.")
+    plt.plot(X_[first_cluster, 0], X_[first_cluster, 2], "b.")
+    plt.plot(X_[second_cluster, 0], X_[second_cluster, 2], "r.")
 
     acc_1 = (
         (labels[: len(first)] == 1).sum()
