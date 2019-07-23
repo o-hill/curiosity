@@ -58,7 +58,7 @@ def mahalanobis(x, mu=None, S=None, return_stats=False):
             The mean vector used in Mahalanobis calculations.
         S - array_like
             The covariance matrix used.
-        """
+    """
     x = np.array(x)
     if mu is None:
         mu = x.mean(0)

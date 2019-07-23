@@ -49,26 +49,25 @@ class LARC:
         num_classes = 2
 
         # self.X = X.reshape(X.shape[0], img_rows, img_cols, 1)
-        input_shape = (img_rows, img_cols, 1)
+        in_shape = (img_rows, img_cols, 1)
 
         model = Sequential()
         model.add(
-            Conv2D(32, kernel_size=(3, 3), activation="relu", input_shape=input_shape)
+            Conv2D(32, kernel_size=(3, 3), activation="relu", input_shape=in_shape)
         )
+        model.add(Conv2D(32, (3, 3), activation="relu"))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        # model.add(Conv2D(64, (3, 3), activation="relu"))
         model.add(Conv2D(64, (3, 3), activation="relu"))
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Dropout(0.25))
         model.add(Flatten())
-        model.add(Dense(200, activation="relu", name="latent"))
-        model.add(Dropout(0.5))
+        model.add(Dense(64, activation="relu"))
+        model.add(Dense(100, activation="relu", name="latent"))
         model.add(Dense(num_classes, activation="softmax"))
-        # model.layers[-1].trainable = False
-        # model.layers[-2].trainable = False
-        # model.layers[-3].trainable = False
 
         model.compile(
             loss=keras.losses.categorical_crossentropy,
-            optimizer=keras.optimizers.Adadelta(),
+            optimizer=keras.optimizers.Adam(),
             metrics=["accuracy"],
         )
         self.model = model
@@ -76,10 +75,10 @@ class LARC:
     def latent(self, X):
         """Return the latent representations, given raw input."""
         # X = X.reshape(X.shape[0], self.img_rows, self.img_cols, 1)
-        ins, outs = self.model.layers[0].input, self.model.layers[5].output
+        ins, outs = self.model.layers[0].input, self.model.get_layer("latent").output
         return K.function([ins], [outs])([X])[0]
 
-    def project_latent(self, X, nb_dims=20):
+    def project_latent(self, X, nb_dims=32):
         """Project latent image representations into target dimensions."""
         # Find the network's latest latent representation.
         print("> Finding latent representations.")
@@ -122,7 +121,7 @@ class LARC:
         else:
             # Cluster the data.
             print("> Clustering projected data.")
-            c = Cluster(n_clusters=2)
+            c = Cluster(n_clusters=3)
             c.fit(X_proj)
             new_labels = c.labels_
         if self.labels is not None:
@@ -147,6 +146,8 @@ class LARC:
 
         print("> Finding valid training data.")
         for label in np.unique(self.labels):
+            if label == 2:
+                continue
             class_idx = np.where(self.labels == label)[0]
             Z = self.X_proj[class_idx, :]
             valid_vector_idx = find_valid_indices(Z)
@@ -173,6 +174,7 @@ if __name__ == "__main__":
     ones_idx = np.where(y_train == 1)[0]
     twos_idx = np.where(y_train == 2)[0]
     fours_idx = np.where(y_train == 4)[0]
+    fives_idx = np.where(y_train == 5)[0]
     eights_idx = np.where(y_train == 8)[0]
     threes_idx = np.where(y_train == 3)[0]
 
@@ -181,17 +183,21 @@ if __name__ == "__main__":
     twos = x_train[twos_idx]
     threes = x_train[threes_idx]
     fours = x_train[fours_idx]
+    fives = x_train[fives_idx]
     eights = x_train[eights_idx]
-    first = twos
-    second = fours
+    first = threes
+    second = fives
+    # second = np.vstack((eights, twos))
 
     ones_twos = np.vstack((first, second))
     ones_twos -= ones_twos.mean(0)
 
     l = LARC()
     l.fit(ones_twos, nb_epochs=1, use_network=False)
-    l.fit(ones_twos, nb_epochs=1, use_network=False)
-    l.fit(ones_twos, nb_epochs=1, use_network=False)
+    # l.fit(ones_twos, nb_epochs=1, use_network=False)
+    # l.fit(ones_twos, nb_epochs=1, use_network=False)
+    # l.fit(ones_twos, nb_epochs=1, use_network=False)
+    # l.fit(ones_twos, nb_epochs=1, use_network=False)
     l.fit(ones_twos, nb_epochs=1, use_network=True)
     _, X_ = l.project_latent(ones_twos, nb_dims=32)
     labels = l.predict_labels(ones_twos)
@@ -201,8 +207,8 @@ if __name__ == "__main__":
     first_cluster = np.where(labels == 0)[0]
     second_cluster = np.where(labels == 1)[0]
     third_cluster = np.where(labels == 2)[0]
-    plt.plot(X_[first_cluster, 0], X_[first_cluster, 3], "b.")
-    plt.plot(X_[second_cluster, 0], X_[second_cluster, 3], "r.")
+    plt.plot(X_[first_cluster, 0], X_[first_cluster, 1], "b.")
+    plt.plot(X_[second_cluster, 0], X_[second_cluster, 1], "r.")
 
     acc_1 = (
         (labels[: len(first)] == 1).sum()
